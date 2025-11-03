@@ -39,7 +39,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<AuthGuard />}>
           <Route index element={<Home />} />
-          <Route path="/mettings/:id" element={<Meeting />} />
+          <Route path="/meetings/:id" element={<Meeting />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>

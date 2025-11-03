@@ -7,21 +7,28 @@ import { meetingRepository } from "../../modules/meetings/meeting.repository";
 import { useEffect, useState } from "react";
 import { PreviewMedia } from "./PreviewMedia";
 import { useMeeting } from "../../modules/meetings/meeting.hook";
+import { useFlashMessage } from "../../modules/ui/ui.state";
 
 function Meeting() {
   const { id } = useParams(); // Get meeting ID from URL params
   const [showPreview, setShowPreview] = useState(true);
-  const { me, getStream, toggleVideo, toggleVoice } = useMeeting(); // useMeetingカスタムフックからmeとgetStreamを取得
+  const { me, getStream, toggleVideo, toggleVoice, join, participants, clear } =
+    useMeeting(id!); // useMeetingカスタムフックからmeとgetStreamを取得
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const { addMessage } = useFlashMessage();
 
   useEffect(() => {
     initialize();
+    // クリーンアップ関数で会議から退出する処理を実行
+    return () => {
+      clear();
+    };
   }, []); // Empty dependency array to run only once on mount
 
   const initialize = async () => {
     try {
-      console.log('Joining meeting with ID:', id);
+      console.log("Joining meeting with ID:", id);
       await meetingRepository.joinMeeting(id!); // 存在しないURLを投げた場合はエラーを返す
       await getStream(); // ユーザーのメディアストリームを取得
       setIsLoading(false);
@@ -31,12 +38,26 @@ function Meeting() {
   };
 
   const joinMeeting = async () => {
+    join();
     setShowPreview(false);
-  }
+  };
 
   const leaveMeeting = async () => {
-    navigate('/');
-  }
+    clear();
+    navigate("/");
+  };
+
+  const copyMeetingId = async () => {
+    try {
+      await navigator.clipboard.writeText(id!);
+      addMessage({
+        message: "ミーティングIDをコピーしました",
+        type: 'success',
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (showPreview) {
     return (
@@ -55,8 +76,15 @@ function Meeting() {
     <div className="meeting-container">
       <div className="video-area">
         <div className="video-grid">
-          <VideoTile participant={me} />
-          <VideoTile participant={me} />
+          <VideoTile
+            participant={{
+              ...me,
+              name: me.name + "(あなた)",
+            }}
+          />
+          {Array.from(participants.values()).map((participant) => (
+            <VideoTile key={participant.id} participant={participant} />
+          ))}
         </div>
       </div>
 
@@ -72,11 +100,11 @@ function Meeting() {
           <FiMessageCircle />
         </button>
 
-        <button className="control-button">
+        <button className="control-button" onClick={copyMeetingId}>
           <FiCopy />
         </button>
 
-        <button className="control-button leave-button">
+        <button className="control-button leave-button" onClick={leaveMeeting}>
           <FiPhone />
         </button>
       </div>

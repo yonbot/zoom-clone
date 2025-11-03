@@ -1,60 +1,75 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { FiVideo, FiUser, FiSettings, FiLogOut } from 'react-icons/fi';
-import './Home.css';
-import { meetingRepository } from '../../modules/meetings/meeting.repository';
+import { Link, useNavigate } from "react-router-dom";
+import { FiVideo, FiUser, FiSettings, FiLogOut } from "react-icons/fi";
+import "./Home.css";
+import { meetingRepository } from "../../modules/meetings/meeting.repository";
+import { useState } from "react";
 
 function Home() {
   const navigate = useNavigate();
+  const [meetingId, setMeetingId] = useState("");
 
   const startMeeting = async () => {
     try {
       const result = await meetingRepository.createMeeting();
-      console.log('meetingId:', result.meetingId);
+      console.log("meetingId:", result.meetingId);
       navigate(`/meetings/${result.meetingId}`);
     } catch (error) {
       console.error(error);
     }
-  }
+  };
+
+  const joinMeeting = async () => {
+    navigate(`/meetings/${meetingId}`);
+  };
 
   return (
-    <div className='home-container'>
-      <nav className='navbar'>
-        <div className='navbar-left'>
-          <h1 className='logo'>Zoom Clone</h1>
+    <div className="home-container">
+      <nav className="navbar">
+        <div className="navbar-left">
+          <h1 className="logo">Zoom Clone</h1>
         </div>
-        <div className='navbar-right'>
-          <span className='username'>田中太郎</span>
-          <Link to='' className='settings-button'>
+        <div className="navbar-right">
+          <span className="username">田中太郎</span>
+          <Link to="" className="settings-button">
             <FiSettings /> 設定
           </Link>
-          <button className='logout-button'>
+          <button className="logout-button">
             <FiLogOut /> ログアウト
           </button>
         </div>
       </nav>
 
-      <main className='main-content'>
-        <div className='meeting-cards'>
-          <div className='meeting-card'>
-            <div className='card-icon camera-icon'>
+      <main className="main-content">
+        <div className="meeting-cards">
+          <div className="meeting-card">
+            <div className="card-icon camera-icon">
               <FiVideo />
             </div>
             <h3>新しいミーティング</h3>
-            <button className='start-meeting-button' onClick={startMeeting}>ミーティングを開始</button>
+            <button className="start-meeting-button" onClick={startMeeting}>
+              ミーティングを開始
+            </button>
           </div>
 
-          <div className='meeting-card'>
-            <div className='card-icon user-icon'>
+          <div className="meeting-card">
+            <div className="card-icon user-icon">
               <FiUser />
             </div>
             <h3>ミーティングに参加</h3>
-            <form className='join-form'>
+            <form className="join-form">
               <input
-                type='text'
-                placeholder='会議ID'
-                className='meeting-id-input'
+                type="text"
+                placeholder="会議ID"
+                className="meeting-id-input"
+                value={meetingId}
+                onChange={(e) => setMeetingId(e.target.value)}
               />
-              <button type='submit' className='join-button'>
+              <button
+                type="submit"
+                className="join-button"
+                disabled={meetingId.length == 0}
+                onClick={joinMeeting}
+              >
                 参加
               </button>
             </form>

@@ -16,11 +16,11 @@ export function VideoTile({ participant }: VideoTileProps) {
         }} // video要素にstreamをセット, refはコールバック関数
         autoPlay
         playsInline
-        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        style={{ width: "100%", height: "100%", objectFit: "cover" }}
       />
       <div className="participant-info">
         <span className="participant-name">{participant.name}</span>
-        <span className="host-badge">ホスト</span>
+        {participant.isHost && <span className="host-badge">ホスト</span>}
         {!participant.voiceOn && (
           <span className="mute-icon">
             <FiVolumeX />

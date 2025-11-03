@@ -7,6 +7,7 @@ export const authRepository = {
     email: string,
     password: string
   ): Promise<{ user: User; token: string }> {
+    // APIにPOSTリクエストを送信してユーザー登録を行う
     const result = await api.post("/auth/signup", {
       name,
       email,
@@ -20,6 +21,7 @@ export const authRepository = {
     email: string,
     password: string
   ): Promise<{ user: User; token: string }> {
+    // APIにPOSTリクエストを送信してサインインを行う
     const result = await api.post("/auth/signin", { email, password });
     const { user, token } = result.data;
     return { user: new User(user), token };

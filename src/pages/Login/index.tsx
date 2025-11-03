@@ -56,7 +56,7 @@ function Login() {
         </div>
 
         <div className="login-links">
-          <Link to="" className="signup-link">
+          <Link to="/signup" className="signup-link">
             アカウント作成
           </Link>
         </div>

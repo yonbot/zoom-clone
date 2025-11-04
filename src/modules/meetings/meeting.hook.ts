@@ -6,6 +6,13 @@ import Peer from "peerjs";
 import { useNavigate } from "react-router-dom";
 import { useFlashMessage } from "../ui/ui.state";
 
+export interface ChatMessage {
+  id: string;
+  userName: string;
+  message: string;
+  createdAt: Date;
+}
+
 export interface Participant {
   id: string;
   name: string;
@@ -32,6 +39,7 @@ export const useMeeting = (meetingId: string) => {
   );
   const navigate = useNavigate();
   const { addMessage } = useFlashMessage();
+  const [chats, setChats] = useState<ChatMessage[]>([]);
 
   useEffect(() => {
     setMe((prev) => ({ ...prev, stream: localStreams[0] })); // streamのみ更新
@@ -126,6 +134,16 @@ export const useMeeting = (meetingId: string) => {
       addMessage({ message: "ミーティングが終了しました", type: "success" });
       navigate("/");
     });
+
+    socket.on("receive-chat", (chat: ChatMessage) => {
+      setChats((prev) => [
+        ...prev,
+        {
+          ...chat,
+          createdAt: new Date(chat.createdAt),
+        },
+      ]);
+    });
   };
 
   const handleSocketConnected = (localStream: MediaStream) => {
@@ -180,6 +198,13 @@ export const useMeeting = (meetingId: string) => {
         setMe((prev) => ({ ...prev, isHost: participant.isHost }));
       }
     });
+
+    setChats(
+      data.chats?.map((chat: ChatMessage) => ({
+        ...chat,
+        createdAt: new Date(chat.createdAt),
+      })) || []
+    );
   };
 
   const clear = () => {
@@ -188,9 +213,26 @@ export const useMeeting = (meetingId: string) => {
       stream.getTracks().forEach((track) => track.stop());
     });
     setLocalStreams([]);
+    setChats([]);
     peerRef.current?.destroy();
     socketRef.current?.disconnect();
   };
 
-  return { me, getStream, toggleVideo, toggleVoice, join, participants, clear };
+  const sendChatMessage = (message: string) => {
+    if (socketRef.current && currentUser) {
+      socketRef.current.emit("send-chat", meetingId, message, currentUser.name);
+    }
+  };
+
+  return {
+    me,
+    getStream,
+    toggleVideo,
+    toggleVoice,
+    join,
+    participants,
+    clear,
+    chats,
+    sendChatMessage,
+  };
 };

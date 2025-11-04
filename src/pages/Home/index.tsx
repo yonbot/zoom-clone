@@ -3,10 +3,13 @@ import { FiVideo, FiUser, FiSettings, FiLogOut } from "react-icons/fi";
 import "./Home.css";
 import { meetingRepository } from "../../modules/meetings/meeting.repository";
 import { useState } from "react";
+import { useAtom } from "jotai";
+import { currentUserAtom } from "../../modules/auth/current-user.state";
 
 function Home() {
   const navigate = useNavigate();
   const [meetingId, setMeetingId] = useState("");
+  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
 
   const startMeeting = async () => {
     try {
@@ -22,6 +25,11 @@ function Home() {
     navigate(`/meetings/${meetingId}`);
   };
 
+  const logout = () => {
+    localStorage.removeItem("token");
+    setCurrentUser(undefined);
+  }
+
   return (
     <div className="home-container">
       <nav className="navbar">
@@ -29,11 +37,11 @@ function Home() {
           <h1 className="logo">Zoom Clone</h1>
         </div>
         <div className="navbar-right">
-          <span className="username">田中太郎</span>
-          <Link to="" className="settings-button">
+          <span className="username">{currentUser!.name}</span>
+          <Link to="/settings" className="settings-button">
             <FiSettings /> 設定
           </Link>
-          <button className="logout-button">
+          <button className="logout-button" onClick={logout}>
             <FiLogOut /> ログアウト
           </button>
         </div>

@@ -1,6 +1,48 @@
-# React + TypeScript + Vite
+# Zoom Clone
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite で構築されたZoomクローンアプリケーション
+
+## 環境変数の設定
+
+### ローカル開発環境
+
+プロジェクトルートに `.env.local` ファイルを作成し、以下の内容を設定してください：
+
+```env
+VITE_API_URL=http://localhost:8888
+```
+
+### 本番環境
+
+本番環境では `.env.production` ファイルが使用され、以下のAPIサーバーが設定されています：
+
+```env
+VITE_API_URL=https://api.srv1003901.hstgr.cloud
+```
+
+## 開発
+
+```bash
+npm install
+npm run dev
+```
+
+## ビルド
+
+```bash
+npm run build
+```
+
+## GitHub Pagesへのデプロイ
+
+このプロジェクトは、GitHub Actionsを使用して自動的にGitHub Pagesにデプロイされます。
+
+1. GitHubリポジトリの設定で、Pagesのソースを「GitHub Actions」に設定してください
+2. `main` ブランチにプッシュすると、自動的にビルドとデプロイが実行されます
+
+### リポジトリ名が異なる場合
+
+リポジトリ名が `zoom-clone` 以外の場合は、`.github/workflows/deploy.yml` の `base` 設定を変更するか、`vite.config.ts` の `basePath` を変更してください。
 
 Currently, two official plugins are available:
 
